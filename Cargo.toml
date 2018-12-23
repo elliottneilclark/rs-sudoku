@@ -1,5 +1,5 @@
 [package]
-name = "rs-sudoku"
+name = "rs_sudoku"
 version = "0.1.0"
 authors = ["Elliott Clark <elliott.neil.clark@gmail.com>"]
 edition = "2018"
