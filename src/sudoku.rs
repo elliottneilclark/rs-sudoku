@@ -1,23 +1,18 @@
-use super::position::Position;
+use super::candidate_set::*;
 pub struct Sudoku {
-    pub positions: [Position; 81],
+    pub positions: Vec<IntCandidateSet>,
 }
 
 impl Sudoku {
     pub fn new(pzl: &str) -> Result<Sudoku, SudokuErr> {
         // Decode the positions
-        let pos_vec: Vec<Position> = pzl.chars().filter_map(Position::new).collect();
+        let pos_vec: Vec<IntCandidateSet> = pzl.chars().filter_map(parse_position).collect();
         // If there aren't enough then bail
         if pos_vec.len() != 81 {
             return Err(SudokuErr::ParseErr());
         }
-        // put the positions into an array for final location.
-        let mut pos: [Position; 81] = [Position { candidates: 0 }; 81];
-        for (i, v) in pos_vec.into_iter().enumerate() {
-            pos[i] = v;
-        }
         // Return the result
-        Ok(Sudoku { positions: pos })
+        Ok(Sudoku { positions: pos_vec })
     }
 
     pub fn num_solved(&self) -> usize {
@@ -40,9 +35,8 @@ pub enum SudokuErr {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    const ONE_LINE: &str =
-        ".1.....25.2.84.3.9.....91.84.....9.3.....6.......5....35..6.....6.1.....98......1";
+    use crate::examples::MULTI_LINE;
+    use crate::examples::ONE_LINE;
 
     #[test]
     fn it_works() {
@@ -64,19 +58,7 @@ mod tests {
 
     #[test]
     fn test_good_multiline() {
-        let p = " . . . | 2 7 1 | . . .
-                 2 . 8 | . . . | 7 . .
-                 . . . | . 3 . | . . .
-                 ------|-------|-------
-                 . . . | 7 5 4 | . . .
-                 . . . | . . . | 2 . .
-                 . . . | 8 . 9 | . . 5
-                 ------|-------|-------
-                 1 2 . | . . 3 | 4 8 .
-                 8 . 5 | . 4 . | 1 7 .
-                 4 3 . | . . . | . 9 .";
-
-        let r = Sudoku::new(p);
+        let r = Sudoku::new(MULTI_LINE);
         assert!(r.is_ok());
     }
 

@@ -1,4 +1,10 @@
-mod position;
+mod candidate_set;
+pub mod examples;
+mod index;
+mod remove_candidates;
+mod solve;
 mod sudoku;
+pub use self::candidate_set::*;
+pub use self::remove_candidates::*;
+pub use self::solve::*;
 pub use self::sudoku::*;
-pub use self::position::*;
