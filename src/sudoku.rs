@@ -1,12 +1,14 @@
-use super::candidate_set::*;
+use super::candidate_set::{parse_position, CandidateSet};
+use super::error::SudokuErr;
+
 pub struct Sudoku {
-    pub positions: Vec<IntCandidateSet>,
+    pub positions: Vec<CandidateSet>,
 }
 
 impl Sudoku {
     pub fn new(pzl: &str) -> Result<Sudoku, SudokuErr> {
         // Decode the positions
-        let pos_vec: Vec<IntCandidateSet> = pzl.chars().filter_map(parse_position).collect();
+        let pos_vec: Vec<CandidateSet> = pzl.chars().filter_map(parse_position).collect();
         // If there aren't enough then bail
         if pos_vec.len() != 81 {
             return Err(SudokuErr::ParseErr());
@@ -18,18 +20,34 @@ impl Sudoku {
     pub fn num_solved(&self) -> usize {
         self.positions
             .iter()
-            .filter(|&x| x.num_candidates() == 1)
+            .filter(|x| x.num_candidates() == 1)
             .count()
     }
 
     pub fn solved(&self) -> bool {
-        self.positions.iter().all(|&x| x.num_candidates() == 1)
+        self.positions.iter().all(|x| x.num_candidates() == 1)
     }
-}
 
-#[derive(Debug)]
-pub enum SudokuErr {
-    ParseErr(),
+    pub fn toggle_solved(&mut self) -> usize {
+        // For all recently changed positions if they now have no other
+        // options then set them as solved.
+        let mut solved = 0;
+        for p in self.positions.iter_mut() {
+            if !p.is_solved() && p.num_candidates() == 1 {
+                p.set_solved();
+                solved += 1;
+            }
+        }
+        solved
+    }
+
+    pub fn oneline(&self) -> String {
+        self.positions
+            .iter()
+            .map(|p| p.value().unwrap_or(0).to_string())
+            .collect::<Vec<String>>()
+            .join("")
+    }
 }
 
 #[cfg(test)]
