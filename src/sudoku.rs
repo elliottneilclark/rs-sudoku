@@ -57,7 +57,13 @@ impl Sudoku {
     pub fn oneline(&self) -> String {
         self.positions
             .iter()
-            .map(|p| p.value().unwrap_or(0).to_string())
+            .map(|p| {
+                let v = p.value().unwrap_or(0);
+                match v {
+                    0 => ".".to_string(),
+                    _ => v.to_string(),
+                }
+            })
             .collect::<Vec<String>>()
             .join("")
     }
