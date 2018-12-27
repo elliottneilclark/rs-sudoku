@@ -38,8 +38,8 @@ impl Solveable for Sudoku {
         let mut hidden_singles = 0;
         let mut cont = true;
         while cont {
-            // First assign anything that can only be
-            println!("Not Done yet {}", self.num_solved());
+            // println!("p = {}", self.oneline());
+            debug_assert!(self.is_valid());
             // Then remove everything that can't be a candidate anymore.
             self.remove_impossible_candidates();
             // Try and assign hidden singles
@@ -74,17 +74,38 @@ impl Solveable for Sudoku {
 mod tests {
     use super::*;
     use crate::examples::*;
-    use crate::sudoku::Sudoku;
+    use crate::parse::*;
 
     #[test]
     fn test_try_solve_easy() {
-        let p = Sudoku::new(ONE_LINE).unwrap();
+        let p = parse_sudoku(ONE_LINE).unwrap();
         let sr = p.try_solve();
         assert_eq!(true, sr.is_solved);
-        assert!(sr.naked_singles >= 2);
+        assert_eq!(37, sr.hidden_singles);
+        assert_eq!(20, sr.naked_singles);
         assert_eq!(
             "819637425527841369643529178476218953135796284298354716351962847764183592982475631",
             sr.state
         );
+    }
+
+    #[test]
+    fn test_bad_fuzz_a() {
+        let s = "
+            2 . 4 | 7 . . | . . 6
+            . . . | . . . | 1 . 4
+            . 1 . | 6 5 . | . 8 .
+            -------|-------|-------
+            . 6 . | . . . | . 1 5
+            . . 3 | . 8 . | . 7 .
+            . . . | 2 6 . | . . .
+            -------|-------|-------
+            . . . | 3 4 . | . . .
+            . . . | . .. | 6 5 . | 5 . . | . . . | . . 1
+
+            ";
+        if let Ok(p) = parse_sudoku(s) {
+            p.try_solve();
+        }
     }
 }

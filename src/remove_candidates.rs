@@ -42,10 +42,11 @@ impl RemoveCandidates for Sudoku {
 mod tests {
     use super::*;
     use crate::examples::ONE_LINE;
+    use crate::parse::*;
 
     #[test]
     fn test_remove_candidates() {
-        let mut p = Sudoku::new(ONE_LINE).unwrap();
-        assert_eq!(57, p.remove_impossible_candidates());
+        let mut p = parse_sudoku(ONE_LINE).unwrap();
+        assert_eq!(12, p.remove_impossible_candidates());
     }
 }
