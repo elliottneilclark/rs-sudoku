@@ -6,7 +6,7 @@ use super::sudoku::Sudoku;
 pub fn parse_sudoku(pzl: &str) -> Result<Sudoku, SudokuErr> {
     // ascii only please
     if !pzl.is_ascii() {
-        return Err(SudokuErr::AsciiErr());
+        return Err(SudokuErr::Ascii());
     }
 
     // Decode the positions
@@ -20,7 +20,7 @@ pub fn parse_sudoku(pzl: &str) -> Result<Sudoku, SudokuErr> {
     }
     // If there aren't enogh then bail
     if used != 81 {
-        return Err(SudokuErr::ParseErr());
+        return Err(SudokuErr::Parse());
     }
     let mut s = Sudoku { positions: p };
     // After removing the impossible candidates
@@ -30,7 +30,7 @@ pub fn parse_sudoku(pzl: &str) -> Result<Sudoku, SudokuErr> {
         // Return the result if the puzzle is not provably invalid.
         Ok(s)
     } else {
-        Err(SudokuErr::InvalidPuzzleErr())
+        Err(SudokuErr::InvalidPuzzle())
     }
 }
 

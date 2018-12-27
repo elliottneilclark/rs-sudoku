@@ -26,7 +26,7 @@ fn find_hidden_single<T: Iterator<Item = u8>>(sudoku: &Sudoku, i: usize, iter: T
 
 fn find_hidden(sudoku: &Sudoku) -> Vec<(u8, u16)> {
     (0..sudoku.positions.len())
-        .filter(|i| sudoku.positions[i.clone() as usize].num_candidates() != 1)
+        .filter(|i| sudoku.positions[*i as usize].num_candidates() != 1)
         .filter_map(|i| {
             let (row_i, col_i, box_i) = get_index_tuple(i as u8);
             find_hidden_single(sudoku, i, row_iter(row_i))

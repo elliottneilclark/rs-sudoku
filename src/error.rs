@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub enum SudokuErr {
-    AsciiErr(),
-    ParseErr(),
-    InvalidPuzzleErr(),
+    Ascii(),
+    Parse(),
+    InvalidPuzzle(),
 }

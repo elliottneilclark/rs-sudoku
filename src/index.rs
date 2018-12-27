@@ -81,8 +81,8 @@ pub fn box_iter(box_i: u8) -> impl Iterator<Item = u8> {
     let start_row = (box_i / 3) * 3;
     let start_col = (box_i % 3) * 3;
     RelatedIndexIterator {
-        start_row: start_row,
-        start_col: start_col,
+        start_row,
+        start_col,
         incr: 0,
         next_position: BoxNextPosition,
     }
@@ -93,10 +93,8 @@ mod tests {
     use super::*;
     #[test]
     fn test_first_row() {
-        let mut idx = 0;
-        for i in row_iter(0) {
-            assert_eq!(idx, i);
-            idx += 1;
+        for (idx, item) in row_iter(0).enumerate() {
+            assert_eq!(idx as u8, item);
         }
     }
 
