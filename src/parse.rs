@@ -10,15 +10,22 @@ pub fn parse_sudoku(pzl: &str) -> Result<Sudoku, SudokuErr> {
     }
 
     // Decode the positions
-    let pos_vec: Vec<CandidateSet> = pzl.chars().filter_map(parse_position).collect();
+    let mut p = [CandidateSet { candidates: 0 }; 81];
+    let mut used = 0;
+    for cs in pzl.chars().filter_map(parse_position) {
+        if used < 81 {
+            p[used] = cs;
+        }
+        used += 1;
+    }
     // If there aren't enogh then bail
-    if pos_vec.len() != 81 {
+    if used != 81 {
         return Err(SudokuErr::ParseErr());
     }
-    let mut s = Sudoku { positions: pos_vec };
+    let mut s = Sudoku { positions: p };
     // After removing the impossible candidates
     // make sure that everything is still valid.
-    s.remove_impossible_candidates();
+    s.remove_candidates(false);
     if s.is_valid() {
         // Return the result if the puzzle is not provably invalid.
         Ok(s)
@@ -55,7 +62,7 @@ mod tests {
     #[test]
     fn test_not_solved() {
         let p = parse_sudoku(ONE_LINE).unwrap();
-        assert_eq!(false, p.solved());
+        assert_eq!(false, p.is_solved());
     }
 
     #[test]

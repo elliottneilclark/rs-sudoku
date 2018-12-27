@@ -2,7 +2,7 @@ use super::candidate_set::CandidateSet;
 use super::index::{box_iter, col_iter, row_iter};
 
 pub struct Sudoku {
-    pub positions: Vec<CandidateSet>,
+    pub positions: [CandidateSet; 81],
 }
 
 const ALL_POSSIBLE: u16 = (1 << 9) - 1;
@@ -35,23 +35,8 @@ impl Sudoku {
             .count()
     }
 
-    pub fn solved(&self) -> bool {
-        debug_assert!(self.is_valid());
+    pub fn is_solved(&self) -> bool {
         self.positions.iter().all(|x| x.num_candidates() == 1)
-    }
-
-    pub fn toggle_solved(&mut self) -> usize {
-        // For all recently changed positions if they now have no other
-        // options then set them as solved.
-        let mut solved = 0;
-        for p in self.positions.iter_mut() {
-            if !p.is_solved() && p.num_candidates() == 1 {
-                p.set_solved();
-                solved += 1;
-            }
-        }
-        debug_assert!(self.is_valid());
-        solved
     }
 
     pub fn oneline(&self) -> String {

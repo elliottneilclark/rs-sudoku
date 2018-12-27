@@ -1,7 +1,7 @@
 use std::char;
 use std::iter::{IntoIterator, Iterator};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CandidateSet {
     pub candidates: u16,
 }

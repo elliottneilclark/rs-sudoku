@@ -6,6 +6,7 @@ use crate::sudoku::Sudoku;
 pub struct SolveReport {
     /// Is the solution sovled.
     pub is_solved: bool,
+    pub is_valid: bool,
     /// How many were already solved before starting?
     pub given: usize,
     /// Number of hidden singles
@@ -31,42 +32,42 @@ pub trait Solveable {
 
 impl Solveable for Sudoku {
     fn try_solve(mut self) -> SolveReport {
-        //  remember how many were solved before this
-        let given = self.num_solved();
+        let mut sr = SolveReport {
+            is_solved: false,
+            is_valid: false,
+            //  remember how many were solved before this
+            given: self.num_solved(),
+            hidden_singles: 0,
+            naked_singles: 0,
+            state: String::new(),
+        };
         // Remember how many were solved with naked singles.
-        let mut naked_singles = 0;
-        let mut hidden_singles = 0;
         let mut cont = true;
         while cont {
-            // println!("p = {}", self.oneline());
-            debug_assert!(self.is_valid());
             // Then remove everything that can't be a candidate anymore.
-            self.remove_impossible_candidates();
+            let (c_0, _s_0) = self.remove_candidates(false);
             // Try and assign hidden singles
             let hs = self.handle_hidden_singles();
             if hs > 0 {
-                hidden_singles += hs;
+                sr.hidden_singles += hs;
                 continue;
             }
-            // Remove things.
-            self.remove_impossible_candidates();
-            // Try and toggle solved.
-            let ns = self.toggle_solved();
-            if ns > 0 {
-                naked_singles += ns;
+            // Remove things setting the solved bit along the way.
+            let (c_1, s_1) = self.remove_candidates(true);
+            if s_1 > 0 {
+                sr.naked_singles += s_1;
                 continue;
             }
-            // We have no more
-            cont = false;
+            // We have no more to do because nothing changed.
+            if c_0 == 0 && c_1 == 0 {
+                cont = false;
+            }
         }
-
-        SolveReport {
-            is_solved: self.solved(),
-            given: given,
-            hidden_singles: hidden_singles,
-            naked_singles: naked_singles,
-            state: self.oneline(),
-        }
+        // Copy the final state into the report.
+        sr.is_solved = self.is_solved();
+        sr.is_valid = self.is_valid();
+        sr.state = self.oneline();
+        sr
     }
 }
 
