@@ -3,13 +3,13 @@ use std::iter::{IntoIterator, Iterator};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CandidateSet {
-    pub candidates: u16,
+    pub candidates: usize,
 }
 
 // Constant with all the candidates turned on.
-const ALL_CAND: u16 = 1 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6 | 1 << 7 | 1 << 8;
+const ALL_CAND: usize = 1 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6 | 1 << 7 | 1 << 8;
 
-const SOLVED: u16 = 1 << 9;
+const SOLVED: usize = 1 << 9;
 
 pub fn parse_position(c: char) -> Option<CandidateSet> {
     // Use a match to get a really small lookup table based decoding.
@@ -41,7 +41,7 @@ pub fn parse_position(c: char) -> Option<CandidateSet> {
         '9' => Some(CandidateSet {
             candidates: SOLVED | 1 << 8,
         }),
-        '0'| '.' | '*' | 'x' => Some(CandidateSet {
+        '0' | '.' | '*' | 'x' => Some(CandidateSet {
             candidates: ALL_CAND,
         }),
         _ => None,
@@ -49,8 +49,8 @@ pub fn parse_position(c: char) -> Option<CandidateSet> {
 }
 
 impl CandidateSet {
-    pub fn num_candidates(self) -> u32 {
-        (self.candidates & !SOLVED).count_ones()
+    pub fn num_candidates(self) -> usize {
+        (self.candidates & !SOLVED).count_ones() as usize
     }
     pub fn is_solved(self) -> bool {
         (self.candidates & SOLVED) == SOLVED
@@ -62,31 +62,31 @@ impl CandidateSet {
         );
         self.candidates |= SOLVED;
     }
-    pub fn value(self) -> Option<u8> {
+    pub fn value(self) -> Option<usize> {
         if self.is_solved() {
             let v = (self.candidates & !SOLVED).trailing_zeros() + 1;
-            Some(v as u8)
+            Some(v as usize)
         } else {
             None
         }
     }
-    pub fn get_candidates(self) -> u16 {
+    pub fn get_candidates(self) -> usize {
         (self.candidates & !SOLVED)
     }
 }
 
 #[derive(Clone, Debug)]
 pub struct CandidateSetIterator {
-    candidates: u16,
+    candidates: usize,
 }
 
 impl Iterator for CandidateSetIterator {
-    type Item = u16;
-    fn next(&mut self) -> Option<u16> {
+    type Item = usize;
+    fn next(&mut self) -> Option<usize> {
         if self.candidates > 0 {
             let ans = 1 << self.candidates.trailing_zeros();
             self.candidates &= self.candidates - 1;
-            Some(ans as u16)
+            Some(ans)
         } else {
             None
         }
@@ -94,7 +94,7 @@ impl Iterator for CandidateSetIterator {
 }
 
 impl IntoIterator for CandidateSet {
-    type Item = u16;
+    type Item = usize;
     type IntoIter = CandidateSetIterator;
     fn into_iter(self) -> CandidateSetIterator {
         debug_assert!(
@@ -110,7 +110,7 @@ impl IntoIterator for CandidateSet {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::mem;
+    
     #[test]
     fn test_new_numbers() {
         for i in 1..10 {
@@ -119,7 +119,7 @@ mod tests {
             assert_eq!(true, p.is_solved());
             if let Some(v) = p.value() {
                 // Values should be equal
-                assert_eq!(i as u8, v);
+                assert_eq!(i as usize, v);
                 // We should get the mask back
                 for iv in p {
                     assert_eq!(1 << (i - 1), iv);
@@ -140,11 +140,6 @@ mod tests {
         for c in ['.', '0', '*'].iter() {
             assert_eq!(ALL_CAND, parse_position(*c).unwrap().candidates);
         }
-    }
-
-    #[test]
-    fn test_struct_size() {
-        assert_eq!(2, mem::size_of::<CandidateSet>());
     }
 
     #[test]

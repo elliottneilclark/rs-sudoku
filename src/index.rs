@@ -1,39 +1,39 @@
 use std::iter::Iterator;
 
-pub type IndexTuple = (u8, u8, u8);
+pub type IndexTuple = (usize, usize, usize);
 
-pub fn get_index_tuple(i: u8) -> IndexTuple {
-    let row_i: u8 = i / 9;
-    let col_i: u8 = i % 9;
-    let box_i: u8 = ((row_i / 3) * 3) + (col_i / 3);
+pub fn get_index_tuple(i: usize) -> IndexTuple {
+    let row_i: usize = i / 9;
+    let col_i: usize = i % 9;
+    let box_i: usize = ((row_i / 3) * 3) + (col_i / 3);
     (row_i, col_i, box_i)
 }
 
-fn to_index(row: u8, col: u8) -> u8 {
+fn to_index(row: usize, col: usize) -> usize {
     (row * 9) + col
 }
 
 pub trait GenPosition {
-    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8;
+    fn gen_position(start_row: usize, start_col: usize, inc: usize) -> usize;
 }
 
 struct RowGenPosition;
 impl GenPosition for RowGenPosition {
-    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
+    fn gen_position(start_row: usize, start_col: usize, inc: usize) -> usize {
         to_index(start_row, start_col + inc)
     }
 }
 
 struct ColumnGenPosition;
 impl GenPosition for ColumnGenPosition {
-    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
+    fn gen_position(start_row: usize, start_col: usize, inc: usize) -> usize {
         to_index(start_row + inc, start_col)
     }
 }
 
 struct BoxGenPosition;
 impl GenPosition for BoxGenPosition {
-    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
+    fn gen_position(start_row: usize, start_col: usize, inc: usize) -> usize {
         let row_inc = inc % 3;
         let col_inc = inc / 3;
         to_index(start_row + row_inc, start_col + col_inc)
@@ -42,26 +42,26 @@ impl GenPosition for BoxGenPosition {
 
 #[derive(Debug)]
 pub struct RelatedIndexIterator<T: GenPosition> {
-    start_row: u8,
-    start_col: u8,
-    incr: u8,
+    start_row: usize,
+    start_col: usize,
+    incr: usize,
     gen_position: T,
 }
 
 impl<T: GenPosition> Iterator for RelatedIndexIterator<T> {
-    type Item = u8;
-    fn next(&mut self) -> Option<u8> {
+    type Item = usize;
+    fn next(&mut self) -> Option<usize> {
         if self.incr >= 9 {
             None
         } else {
             let i = T::gen_position(self.start_row, self.start_col, self.incr);
             self.incr += 1;
-            Some(i as u8)
+            Some(i)
         }
     }
 }
 
-pub fn row_iter(row: u8) -> impl Iterator<Item = u8> {
+pub fn row_iter(row: usize) -> impl Iterator<Item = usize> {
     RelatedIndexIterator {
         start_row: row,
         start_col: 0,
@@ -69,7 +69,7 @@ pub fn row_iter(row: u8) -> impl Iterator<Item = u8> {
         gen_position: RowGenPosition,
     }
 }
-pub fn col_iter(col: u8) -> impl Iterator<Item = u8> {
+pub fn col_iter(col: usize) -> impl Iterator<Item = usize> {
     RelatedIndexIterator {
         start_row: 0,
         start_col: col,
@@ -77,7 +77,7 @@ pub fn col_iter(col: u8) -> impl Iterator<Item = u8> {
         gen_position: ColumnGenPosition,
     }
 }
-pub fn box_iter(box_i: u8) -> impl Iterator<Item = u8> {
+pub fn box_iter(box_i: usize) -> impl Iterator<Item = usize> {
     let start_row = (box_i / 3) * 3;
     let start_col = (box_i % 3) * 3;
     RelatedIndexIterator {
@@ -94,7 +94,7 @@ mod tests {
     #[test]
     fn test_first_row() {
         for (idx, item) in row_iter(0).enumerate() {
-            assert_eq!(idx as u8, item);
+            assert_eq!(idx, item);
         }
     }
 

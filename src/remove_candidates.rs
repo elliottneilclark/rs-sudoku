@@ -7,27 +7,27 @@ pub trait RemoveCandidates {
 
 impl RemoveCandidates for Sudoku {
     fn remove_candidates(&mut self, set_solved: bool) -> (usize, usize) {
-        let mut column_solved_set: [u16; 9] = [0; 9];
-        let mut row_solved_set: [u16; 9] = [0; 9];
-        let mut box_solved_set: [u16; 9] = [0; 9];
+        let mut column_solved_set: [usize; 9] = [0; 9];
+        let mut row_solved_set: [usize; 9] = [0; 9];
+        let mut box_solved_set: [usize; 9] = [0; 9];
         // Get the candidates that already have a single solution.
         for (i, set) in self.positions.iter().enumerate() {
             if set.num_candidates() == 1 {
-                let (row_i, col_i, box_i) = get_index_tuple(i as u8);
-                row_solved_set[row_i as usize] |= set.candidates;
-                column_solved_set[col_i as usize] |= set.candidates;
-                box_solved_set[box_i as usize] |= set.candidates;
+                let (row_i, col_i, box_i) = get_index_tuple(i);
+                row_solved_set[row_i] |= set.candidates;
+                column_solved_set[col_i] |= set.candidates;
+                box_solved_set[box_i] |= set.candidates;
             }
         }
         let mut solved = 0;
         let mut changed = 0;
         for (i, set) in self.positions.iter_mut().enumerate() {
-            let (row_i, col_i, box_i) = get_index_tuple(i as u8);
+            let (row_i, col_i, box_i) = get_index_tuple(i);
             if set.num_candidates() != 1 {
                 let new_set = set.candidates
-                    & !row_solved_set[row_i as usize]
-                    & !column_solved_set[col_i as usize]
-                    & !box_solved_set[box_i as usize];
+                    & !row_solved_set[row_i]
+                    & !column_solved_set[col_i]
+                    & !box_solved_set[box_i];
                 // If there has been a change then remember that.
                 if set.candidates != new_set {
                     changed += 1;

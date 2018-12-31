@@ -5,16 +5,16 @@ pub struct Sudoku {
     pub positions: [CandidateSet; 81],
 }
 
-const ALL_POSSIBLE: u16 = (1 << 9) - 1;
-fn valid_group<T: Iterator<Item = u8>>(sudoku: &Sudoku, mut iter: T) -> bool {
+const ALL_POSSIBLE: usize = (1 << 9) - 1;
+fn valid_group<T: Iterator<Item = usize>>(sudoku: &Sudoku, mut iter: T) -> bool {
     // Set for solved
     let mut s = 0;
     // set for all
     let mut a = 0;
     iter.all(|i| {
-        let m = sudoku.positions[i as usize].get_candidates();
+        let m = sudoku.positions[i].get_candidates();
         a |= m;
-        if sudoku.positions[i as usize].is_solved() {
+        if sudoku.positions[i].is_solved() {
             if (s & m) != 0 {
                 false
             } else {
