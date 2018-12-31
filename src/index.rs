@@ -13,48 +13,48 @@ fn to_index(row: u8, col: u8) -> u8 {
     (row * 9) + col
 }
 
-pub trait NextPosition {
-    fn next_position(start_row: u8, start_col: u8, inc: u8) -> u8;
+pub trait GenPosition {
+    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8;
 }
 
-struct RowNextPosition;
-impl NextPosition for RowNextPosition {
-    fn next_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
+struct RowGenPosition;
+impl GenPosition for RowGenPosition {
+    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
         to_index(start_row, start_col + inc)
     }
 }
 
-struct ColumnNextPosition;
-impl NextPosition for ColumnNextPosition {
-    fn next_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
+struct ColumnGenPosition;
+impl GenPosition for ColumnGenPosition {
+    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
         to_index(start_row + inc, start_col)
     }
 }
 
-struct BoxNextPosition;
-impl NextPosition for BoxNextPosition {
-    fn next_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
-        let row_inc = inc / 3;
-        let col_inc = inc % 3;
+struct BoxGenPosition;
+impl GenPosition for BoxGenPosition {
+    fn gen_position(start_row: u8, start_col: u8, inc: u8) -> u8 {
+        let row_inc = inc % 3;
+        let col_inc = inc / 3;
         to_index(start_row + row_inc, start_col + col_inc)
     }
 }
 
 #[derive(Debug)]
-pub struct RelatedIndexIterator<T: NextPosition> {
+pub struct RelatedIndexIterator<T: GenPosition> {
     start_row: u8,
     start_col: u8,
     incr: u8,
-    next_position: T,
+    gen_position: T,
 }
 
-impl<T: NextPosition> Iterator for RelatedIndexIterator<T> {
+impl<T: GenPosition> Iterator for RelatedIndexIterator<T> {
     type Item = u8;
     fn next(&mut self) -> Option<u8> {
         if self.incr >= 9 {
             None
         } else {
-            let i = T::next_position(self.start_row, self.start_col, self.incr);
+            let i = T::gen_position(self.start_row, self.start_col, self.incr);
             self.incr += 1;
             Some(i as u8)
         }
@@ -66,7 +66,7 @@ pub fn row_iter(row: u8) -> impl Iterator<Item = u8> {
         start_row: row,
         start_col: 0,
         incr: 0,
-        next_position: RowNextPosition,
+        gen_position: RowGenPosition,
     }
 }
 pub fn col_iter(col: u8) -> impl Iterator<Item = u8> {
@@ -74,7 +74,7 @@ pub fn col_iter(col: u8) -> impl Iterator<Item = u8> {
         start_row: 0,
         start_col: col,
         incr: 0,
-        next_position: ColumnNextPosition,
+        gen_position: ColumnGenPosition,
     }
 }
 pub fn box_iter(box_i: u8) -> impl Iterator<Item = u8> {
@@ -84,7 +84,7 @@ pub fn box_iter(box_i: u8) -> impl Iterator<Item = u8> {
         start_row,
         start_col,
         incr: 0,
-        next_position: BoxNextPosition,
+        gen_position: BoxGenPosition,
     }
 }
 
