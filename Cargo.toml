@@ -10,7 +10,7 @@ edition = "2018"
 criterion = "0.2"
 
 [[bench]]
-name = "my_benchmark"
+name = "parse_solve"
 harness = false
 
 [profile.release]

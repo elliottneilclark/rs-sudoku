@@ -1,7 +1,8 @@
 use std::char;
+use std::fmt;
 use std::iter::{IntoIterator, Iterator};
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct CandidateSet {
     pub candidates: usize,
 }
@@ -84,9 +85,13 @@ impl Iterator for CandidateSetIterator {
     type Item = usize;
     fn next(&mut self) -> Option<usize> {
         if self.candidates > 0 {
-            let ans = 1 << self.candidates.trailing_zeros();
+            // Keep a copy of the current value
+            let sav = self.candidates;
+            // Remove the last set bit
+            // and save it in self.candidates
             self.candidates &= self.candidates - 1;
-            Some(ans)
+            // Now return the difference
+            Some(sav - self.candidates)
         } else {
             None
         }
@@ -98,19 +103,40 @@ impl IntoIterator for CandidateSet {
     type IntoIter = CandidateSetIterator;
     fn into_iter(self) -> CandidateSetIterator {
         debug_assert!(
-            (self.candidates & !SOLVED) != 0,
-            "Candidate sets should never be empty"
+            self.get_candidates().count_ones() <= 9,
+            "We should always have 9 or fewer digits set."
         );
         CandidateSetIterator {
-            candidates: self.candidates & !SOLVED,
+            candidates: self.get_candidates(),
         }
+    }
+}
+
+impl fmt::Debug for CandidateSet {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // For every mask convert it to the
+        // possible value, convert that to
+        // string, then collect that into a vec, then join into a string.
+        let cstr = self
+            .into_iter()
+            .map(|c| (c.trailing_zeros() + 1).to_string())
+            .collect::<Vec<String>>()
+            .join(", ");
+        // Add that all to the formatter.
+        write!(
+            f,
+            "CandidateSet{{candidates: [{}], is_solved: {}, num_candidates: {} }}",
+            cstr,
+            self.is_solved(),
+            self.num_candidates()
+        )
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_new_numbers() {
         for i in 1..10 {

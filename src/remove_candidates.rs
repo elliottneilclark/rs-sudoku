@@ -14,6 +14,10 @@ impl RemoveCandidates for Sudoku {
         for (i, set) in self.positions.iter().enumerate() {
             if set.num_candidates() == 1 {
                 let (row_i, col_i, box_i) = get_index_tuple(i);
+                // We explicitly don't use get_candidates here.
+                // The masks that we're generating will only be used for
+                // positions with num_candidates > 1 and hence no
+                // is_solved bit set.
                 row_solved_set[row_i] |= set.candidates;
                 column_solved_set[col_i] |= set.candidates;
                 box_solved_set[box_i] |= set.candidates;

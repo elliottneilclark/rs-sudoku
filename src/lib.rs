@@ -6,6 +6,7 @@ mod index;
 mod parse;
 mod remove_candidates;
 mod solve;
+mod subset;
 mod sudoku;
 
 pub use self::error::SudokuErr;

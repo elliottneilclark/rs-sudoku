@@ -1,5 +1,5 @@
 use super::candidate_set::CandidateSet;
-use super::index::{box_iter, col_iter, row_iter};
+use super::index::ALL_GROUPINGS;
 
 pub struct Sudoku {
     pub positions: [CandidateSet; 81],
@@ -29,14 +29,11 @@ fn valid_group<T: Iterator<Item = usize>>(sudoku: &Sudoku, mut iter: T) -> bool 
 
 impl Sudoku {
     pub fn num_solved(&self) -> usize {
-        self.positions
-            .iter()
-            .filter(|x| x.num_candidates() == 1)
-            .count()
+        self.positions.iter().filter(|x| x.is_solved()).count()
     }
 
     pub fn is_solved(&self) -> bool {
-        self.positions.iter().all(|x| x.num_candidates() == 1)
+        self.positions.iter().all(|x| x.is_solved())
     }
 
     pub fn oneline(&self) -> String {
@@ -60,10 +57,8 @@ impl Sudoku {
     ///
     /// This doesn't 100% mean that the puzzle has a unique solution.
     pub fn is_valid(&self) -> bool {
-        (0..9).all(|idx| {
-            valid_group(self, row_iter(idx))
-                && valid_group(self, col_iter(idx))
-                && valid_group(self, box_iter(idx))
-        })
+        ALL_GROUPINGS
+            .iter()
+            .all(|g| (0..9).all(|idx| valid_group(self, g.iter(idx))))
     }
 }
