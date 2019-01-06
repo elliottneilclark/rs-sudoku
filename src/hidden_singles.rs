@@ -1,3 +1,4 @@
+use crate::candidate_set::CandidateSet;
 use crate::index::ALL_GROUPINGS;
 use crate::sudoku::Sudoku;
 use std::iter::Iterator;
@@ -16,7 +17,7 @@ impl HiddenSingles for Sudoku {
                 let mut counts = [0; 9];
                 let mut last_index = [0; 9];
                 for i in g.iter(g_idx) {
-                    for c in self.positions[i] {
+                    for c in self[i] {
                         let cc = c.trailing_zeros() as usize;
                         counts[cc] += 1;
                         last_index[cc] = i;
@@ -26,9 +27,9 @@ impl HiddenSingles for Sudoku {
                 for (c_idx, count) in counts.iter().enumerate() {
                     if *count == 1 {
                         let s_idx = last_index[c_idx];
-                        if self.positions[s_idx].num_candidates() != 1 {
-                            self.positions[s_idx].candidates = 1 << c_idx;
-                            self.positions[s_idx].set_solved();
+                        if self[s_idx].num_candidates() != 1 {
+                            self[s_idx] = CandidateSet::new(1 << c_idx);
+                            self[s_idx].set_solved();
                             solved += 1;
                         }
                     }

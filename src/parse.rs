@@ -1,4 +1,4 @@
-use super::candidate_set::{parse_position, CandidateSet};
+use super::candidate_set::CandidateSet;
 use super::error::SudokuErr;
 use super::remove_candidates::*;
 use super::sudoku::Sudoku;
@@ -10,9 +10,9 @@ pub fn parse_sudoku(pzl: &str) -> Result<Sudoku, SudokuErr> {
     }
 
     // Decode the positions
-    let mut p = [CandidateSet { candidates: 0 }; 81];
+    let mut p = [CandidateSet::default(); 81];
     let mut used = 0;
-    for cs in pzl.chars().filter_map(parse_position) {
+    for cs in pzl.chars().filter_map(CandidateSet::parse_position) {
         if used < 81 {
             p[used] = cs;
         }
@@ -22,7 +22,7 @@ pub fn parse_sudoku(pzl: &str) -> Result<Sudoku, SudokuErr> {
     if used != 81 {
         return Err(SudokuErr::Parse());
     }
-    let mut s = Sudoku { positions: p };
+    let mut s = Sudoku::new(p);
     // After removing the impossible candidates
     // make sure that everything is still valid.
     s.remove_candidates(false);

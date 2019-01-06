@@ -1,5 +1,6 @@
-use super::index_helpers::get_index_tuple;
-use super::sudoku::Sudoku;
+use crate::candidate_set::CandidateSet;
+use crate::index_helpers::get_index_tuple;
+use crate::sudoku::Sudoku;
 
 pub trait RemoveCandidates {
     fn remove_candidates(&mut self, set_solved: bool) -> (usize, usize);
@@ -11,31 +12,32 @@ impl RemoveCandidates for Sudoku {
         let mut row_solved_set: [usize; 9] = [0; 9];
         let mut box_solved_set: [usize; 9] = [0; 9];
         // Get the candidates that already have a single solution.
-        for (i, set) in self.positions.iter().enumerate() {
+        for (i, set) in self.iter().enumerate() {
             if set.num_candidates() == 1 {
                 let (row_i, col_i, box_i) = get_index_tuple(i);
                 // We explicitly don't use get_candidates here.
                 // The masks that we're generating will only be used for
                 // positions with num_candidates > 1 and hence no
                 // is_solved bit set.
-                row_solved_set[row_i] |= set.candidates;
-                column_solved_set[col_i] |= set.candidates;
-                box_solved_set[box_i] |= set.candidates;
+                let v: usize = set.get();
+                row_solved_set[row_i] |= v;
+                column_solved_set[col_i] |= v;
+                box_solved_set[box_i] |= v;
             }
         }
         let mut solved = 0;
         let mut changed = 0;
-        for (i, set) in self.positions.iter_mut().enumerate() {
+        for (i, set) in self.iter_mut().enumerate() {
             let (row_i, col_i, box_i) = get_index_tuple(i);
             if set.num_candidates() != 1 {
-                let new_set = set.candidates
+                let new_set: usize = set.get()
                     & !row_solved_set[row_i]
                     & !column_solved_set[col_i]
                     & !box_solved_set[box_i];
                 // If there has been a change then remember that.
-                if set.candidates != new_set {
+                if set.get() != new_set {
                     changed += 1;
-                    set.candidates = new_set;
+                    *set = CandidateSet::new(new_set);
                 }
             }
 

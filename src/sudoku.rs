@@ -1,20 +1,20 @@
 use super::candidate_set::CandidateSet;
 use super::index::ALL_GROUPINGS;
+use std::ops::{Deref,DerefMut};
 
-pub struct Sudoku {
-    pub positions: [CandidateSet; 81],
-}
+pub struct Sudoku([CandidateSet; 81]);
 
 const ALL_POSSIBLE: usize = (1 << 9) - 1;
+
 fn valid_group<T: Iterator<Item = usize>>(sudoku: &Sudoku, mut iter: T) -> bool {
     // Set for solved
     let mut s = 0;
     // set for all
     let mut a = 0;
     iter.all(|i| {
-        let m = sudoku.positions[i].get_candidates();
+        let m = sudoku[i].get_candidates();
         a |= m;
-        if sudoku.positions[i].is_solved() {
+        if sudoku[i].is_solved() {
             if (s & m) != 0 {
                 false
             } else {
@@ -27,17 +27,32 @@ fn valid_group<T: Iterator<Item = usize>>(sudoku: &Sudoku, mut iter: T) -> bool 
     }) && a == ALL_POSSIBLE
 }
 
+impl Deref for Sudoku {
+    type Target = [CandidateSet];
+    fn deref(&self) -> &[CandidateSet] {
+        &self.0
+    }
+}
+impl DerefMut for Sudoku {
+    fn deref_mut(&mut self) -> &mut [CandidateSet] {
+        &mut self.0
+    }
+}
+
 impl Sudoku {
+    pub fn new(positions: [CandidateSet; 81]) -> Self {
+        Sudoku(positions)
+    }
     pub fn num_solved(&self) -> usize {
-        self.positions.iter().filter(|x| x.is_solved()).count()
+        self.0.iter().filter(|x| x.is_solved()).count()
     }
 
     pub fn is_solved(&self) -> bool {
-        self.positions.iter().all(|x| x.is_solved())
+        self.0.iter().all(|x| x.is_solved())
     }
 
     pub fn oneline(&self) -> String {
-        self.positions
+        self.0
             .iter()
             .map(|p| {
                 let v = p.value().unwrap_or(0);

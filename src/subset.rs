@@ -1,3 +1,4 @@
+use crate::candidate_set::CandidateSet;
 use crate::index::ALL_GROUPINGS;
 use crate::sudoku::Sudoku;
 
@@ -27,11 +28,11 @@ fn gen_subset<T: std::iter::Iterator<Item = usize>>(
     let expected_count = subset.len();
     let mask: usize = subset
         .iter()
-        .map(|i| sudoku.positions[*i].get_candidates())
+        .map(|i| sudoku[*i].get_candidates())
         .fold(0, |a, b| a | b);
     let other: usize = g_iter
         .filter(|i| !subset.iter().any(|s| *i == *s))
-        .map(|i| sudoku.positions[i].get_candidates())
+        .map(|i| sudoku[i].get_candidates())
         .fold(0, |a, b| a | b);
     let m_count = mask.count_ones() as usize;
     let m_only_count = (mask & !other).count_ones() as usize;
@@ -53,11 +54,11 @@ fn gen_subset<T: std::iter::Iterator<Item = usize>>(
 }
 
 fn remove_candidate(sudoku: &mut Sudoku, mask: usize, p: usize) -> (usize, usize) {
-    let c = sudoku.positions[p].candidates & mask;
-    if c != sudoku.positions[p].candidates {
-        sudoku.positions[p].candidates = c;
+    let c = sudoku[p].get() & mask;
+    if c != sudoku[p].get() {
+        sudoku[p] = CandidateSet::new(c);
         if c.count_ones() == 1 {
-            sudoku.positions[p].set_solved();
+            sudoku[p].set_solved();
             (1, 1)
         } else {
             (1, 0)
