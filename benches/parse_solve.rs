@@ -13,18 +13,14 @@ fn parse_solve(p_str: &str) -> Option<SolveReport> {
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("easy parse", |b| b.iter(|| parse_solve(ONE_LINE)));
-    c.bench_function("multiline parse", |b| b.iter(|| parse_solve(MULTI_LINE)));
-    c.bench_function("hard", |b| {
-        b.iter(|| {
-            parse_solve(
-                "....5..6.9.5..82...4..97.5..64......5.2.8.7.1......63..8.52..1...39..4.2.2..6....",
-            )
+    let b = Benchmark::new("easy", |b| b.iter(|| parse_solve(ONE_LINE)))
+        .with_function("multi_line", |b| b.iter(|| parse_solve(MULTI_LINE)))
+        .with_function("lots", |b| {
+            b.iter(|| PUZZLES.lines().filter_map(parse_solve).count())
         })
-    });
-    c.bench_function("parse/solve lots", |b| {
-        b.iter(|| PUZZLES.lines().filter_map(parse_solve).count())
-    });
+        .with_function("hard", |b| b.iter(|| parse_solve(HARD)))
+        .sample_size(250);
+    c.bench("parse_solve", b);
 }
 
 criterion_group!(benches, criterion_benchmark);

@@ -1,4 +1,4 @@
-use crate::index::{RelatedIndexIterator, ALL_GROUPINGS};
+use crate::index::ALL_GROUPINGS;
 use crate::sudoku::Sudoku;
 
 pub trait FindSubset {
@@ -19,7 +19,11 @@ enum Subset {
     Hidden(usize, Vec<usize>),
 }
 
-fn gen_subset(sudoku: &Sudoku, subset: Vec<usize>, g_iter: RelatedIndexIterator) -> Option<Subset> {
+fn gen_subset<T: std::iter::Iterator<Item = usize>>(
+    sudoku: &Sudoku,
+    subset: Vec<usize>,
+    g_iter: T,
+) -> Option<Subset> {
     let expected_count = subset.len();
     let mask: usize = subset
         .iter()
@@ -81,10 +85,10 @@ fn remove_candidates<I: std::iter::Iterator<Item = usize>>(
         None
     }
 }
-fn handle_subset(
+fn handle_subset<T: std::iter::Iterator<Item = usize>>(
     sudoku: &mut Sudoku,
     m: Subset,
-    i: RelatedIndexIterator,
+    i: T,
 ) -> Option<(usize, usize)> {
     match m {
         Subset::Naked(mask, v) => {

@@ -13,6 +13,14 @@ criterion = "0.2"
 name = "parse_solve"
 harness = false
 
+[[bench]]
+name = "iter_compare"
+harness = false
+
+[[bench]]
+name = "iter_comb_compare"
+harness = false
+
 [profile.release]
 debug = true
 lto = true

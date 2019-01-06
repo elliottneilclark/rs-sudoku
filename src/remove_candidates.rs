@@ -1,4 +1,4 @@
-use super::index::get_index_tuple;
+use super::index_helpers::get_index_tuple;
 use super::sudoku::Sudoku;
 
 pub trait RemoveCandidates {
