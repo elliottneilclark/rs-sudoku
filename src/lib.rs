@@ -14,10 +14,13 @@ mod index;
 mod candidate_set;
 mod error;
 mod parse;
+mod remove_mask;
 mod sudoku;
 
 // The modules that make up solve
+mod box_line;
 mod hidden_singles;
+mod pointing_pairs;
 mod remove_candidates;
 mod subset;
 

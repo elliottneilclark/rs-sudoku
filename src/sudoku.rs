@@ -1,6 +1,6 @@
 use super::candidate_set::CandidateSet;
 use super::index::ALL_GROUPINGS;
-use std::ops::{Deref,DerefMut};
+use std::ops::{Deref, DerefMut};
 
 pub struct Sudoku([CandidateSet; 81]);
 

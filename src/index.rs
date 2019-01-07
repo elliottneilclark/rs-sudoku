@@ -28,4 +28,18 @@ impl Grouping {
             Grouping::BoxType => fast_index::box_comb_iter(i, subset_size),
         }
     }
+    pub fn start_row(&self, i: usize) -> usize {
+        match *self {
+            Grouping::RowType => i,
+            Grouping::ColumnType => 0,
+            Grouping::BoxType => (i / 3) * 3,
+        }
+    }
+    pub fn start_column(&self, i: usize) -> usize {
+        match *self {
+            Grouping::RowType => 0,
+            Grouping::ColumnType => i,
+            Grouping::BoxType => (i % 3) * 3,
+        }
+    }
 }

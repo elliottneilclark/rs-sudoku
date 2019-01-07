@@ -1,4 +1,6 @@
+use crate::box_line::LineBoxReduction;
 use crate::hidden_singles::HiddenSingles;
+use crate::pointing_pairs::Pointing;
 use crate::remove_candidates::RemoveCandidates;
 use crate::subset::FindSubset;
 use crate::sudoku::Sudoku;
@@ -23,6 +25,8 @@ pub struct SolveReport {
     ///
     /// The number of positions solved by having no other options.
     pub naked_singles: usize,
+    pub num_pointing: usize,
+    pub box_line: usize,
     /// The number of times that a {Naked,Hidden}{Double,Triple} is
     /// used to remove a candidate.
     ///
@@ -47,6 +51,8 @@ impl Solveable for Sudoku {
             hidden_singles: 0,
             naked_singles: 0,
             subsets_used: 0,
+            num_pointing: 0,
+            box_line: 0,
             state: String::new(),
         };
         // Remember how many were solved with naked singles.
@@ -67,9 +73,21 @@ impl Solveable for Sudoku {
                 continue;
             }
 
-            let (c_2, _s_2) = self.find_subset();
+            let (c_2, _s_2) = self.handle_pointing();
             if c_2 > 0 {
-                sr.subsets_used += c_2;
+                sr.num_pointing += c_2;
+                continue;
+            }
+
+            let (c_3, _s_4) = self.box_line_reduce();
+            if c_3 > 0 {
+                sr.box_line += c_3;
+                continue;
+            }
+
+            let (c_4, _s_4) = self.find_subset();
+            if c_4 > 0 {
+                sr.subsets_used += c_4;
                 continue;
             }
             // We have no more to do because nothing changed.
@@ -135,6 +153,50 @@ mod tests {
                 "486591732135278469972463158627814593851937246394625871563142987249786315718359624",
                 sr.state
             );
+        }
+    }
+
+    #[test]
+    fn test_pointing() {
+        let s = "010903600000080000900000507002010430000402000064070200701000005000030000005601020";
+        if let Ok(p) = parse_sudoku(s) {
+            let sr = p.try_solve();
+            assert!(sr.num_pointing > 4);
+            assert!(sr.is_valid);
+            // assert_eq!(
+            //     "417953682256187943983246517872519436539462871164378259791824365628735194345691728",
+            //     sr.state
+            // );
+        }
+    }
+
+    #[test]
+    fn test_box_line() {
+        let s = "016007803000800000070001060048000300600000002009000650060900020000002000904600510";
+        if let Ok(p) = parse_sudoku(s) {
+            let sr = p.try_solve();
+            assert!(sr.is_valid);
+            assert!(sr.num_pointing > 4);
+            assert!(sr.box_line > 2);
+            // assert_eq!(
+            //     "416527893592836147873491265148265379657319482239784651361958724785142936924673518",
+            //     sr.state
+            // );
+        }
+    }
+
+    #[test]
+    fn test_another_line_box() {
+        let s = "....4278..7.6...24...............675.4..8......1...2...64.....1..8.3....1.35.....";
+        if let Ok(p) = parse_sudoku(s) {
+            let sr = p.try_solve();
+            assert!(sr.is_valid);
+            assert!(sr.box_line > 2);
+            assert_eq!(
+                "315942786879651324426378159982413675647285913531769248264897531758136492193524867",
+                sr.state
+            );
+            assert!(sr.is_solved);
         }
     }
 
