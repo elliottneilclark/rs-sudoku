@@ -1,6 +1,6 @@
 [package]
 name = "rs_sudoku"
-version = "0.1.2-alpha.0"
+version = "0.1.2"
 authors = ["Elliott Clark <elliott.neil.clark@gmail.com>"]
 keywords = ["sudoku"]
 categories = ["games"]
