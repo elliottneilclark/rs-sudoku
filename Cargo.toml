@@ -2,6 +2,12 @@
 name = "rs_sudoku"
 version = "0.1.0"
 authors = ["Elliott Clark <elliott.neil.clark@gmail.com>"]
+keywords = ["sudoku"]
+categories = ["games"]
+homepage = "https://gitlab.com/eclark/rs-sudoku"
+repository = "https://gitlab.com/eclark/rs-sudoku"
+description = "A library to solve sudoku puzzles using explainable methods."
+license = "Apache-2.0"
 edition = "2018"
 
 [dependencies]
