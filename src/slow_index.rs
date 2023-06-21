@@ -68,7 +68,7 @@ impl GenPosition for BoxGenPosition {
 
 pub struct RelatedIndexIterator {
     pub incr: usize,
-    pub gp: Box<GenPosition>,
+    pub gp: Box<dyn GenPosition>,
 }
 impl Iterator for RelatedIndexIterator {
     type Item = usize;
@@ -86,7 +86,7 @@ impl Iterator for RelatedIndexIterator {
 pub struct MultiRelatedIndexIterator {
     pub idx: [usize; 4],
     pub num_idx: usize,
-    pub gp: Box<GenPosition>,
+    pub gp: Box<dyn GenPosition>,
 }
 impl MultiRelatedIndexIterator {
     pub fn new(num_idx: usize) -> Self {
@@ -103,7 +103,7 @@ impl MultiRelatedIndexIterator {
             gp: Box::new(RowGenPosition::new(0)),
         }
     }
-    pub fn set_gen_position(self, gp: Box<GenPosition>) -> Self {
+    pub fn set_gen_position(self, gp: Box<dyn GenPosition>) -> Self {
         MultiRelatedIndexIterator { gp, ..self }
     }
 }
@@ -191,7 +191,7 @@ mod tests {
     #[test]
     fn test_first_row() {
         let i = RelatedIndexIterator {
-            incr: 0 as usize,
+            incr: 0_usize,
             gp: Box::new(RowGenPosition::new(0)),
         };
         for (idx, item) in i.enumerate() {
@@ -203,7 +203,7 @@ mod tests {
     fn test_first_col() {
         let mut idx = 0;
         let i = RelatedIndexIterator {
-            incr: 0 as usize,
+            incr: 0_usize,
             gp: Box::new(ColumnGenPosition::new(0)),
         };
         for i in i {

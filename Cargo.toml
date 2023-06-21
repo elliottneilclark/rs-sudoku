@@ -5,15 +5,15 @@ authors = ["Elliott Clark <elliott.neil.clark@gmail.com>"]
 keywords = ["sudoku"]
 categories = ["games"]
 homepage = "https://docs.rs/rs_sudoku/"
-repository = "https://gitlab.com/eclark/rs-sudoku"
+repository = "https://github.com/elliottneilclark/rs-sudoku"
 description = "A library to solve sudoku puzzles using explainable methods."
 license = "Apache-2.0"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 
 [dev-dependencies]
-criterion = "0.2"
+criterion = "0.5.1"
 
 [[bench]]
 name = "parse_solve"

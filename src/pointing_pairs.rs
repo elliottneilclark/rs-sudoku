@@ -9,7 +9,7 @@ pub trait Pointing {
 
 impl Pointing for Sudoku {
     fn handle_pointing(&mut self) -> (usize, usize) {
-        let g = Grouping::BoxType;
+        let g = Grouping::Box;
         (0..9)
             .find_map(|box_i| {
                 let start_row = g.start_row(box_i);
@@ -58,7 +58,7 @@ impl Pointing for Sudoku {
                     if only_row != 0 {
                         let row = start_row + idx;
                         assert!(only_row.count_ones() <= 3);
-                        let iter = Grouping::RowType.iter(row).filter(|i| {
+                        let iter = Grouping::Row.iter(row).filter(|i| {
                             let (_, _, b) = get_index_tuple(*i);
                             b != box_i
                         });
@@ -68,7 +68,7 @@ impl Pointing for Sudoku {
                     if only_col != 0 {
                         let col = start_col + idx;
                         assert!(only_col.count_ones() <= 3);
-                        let iter = Grouping::ColumnType.iter(col).filter(|i| {
+                        let iter = Grouping::Column.iter(col).filter(|i| {
                             let (_, _, b) = get_index_tuple(*i);
                             b != box_i
                         });
@@ -82,6 +82,6 @@ impl Pointing for Sudoku {
                     None
                 }
             })
-            .unwrap_or_else(|| (0, 0))
+            .unwrap_or((0, 0))
     }
 }

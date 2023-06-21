@@ -13,14 +13,14 @@ fn parse_solve(p_str: &str) -> Option<SolveReport> {
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    let b = Benchmark::new("easy", |b| b.iter(|| parse_solve(ONE_LINE)))
-        .with_function("multi_line", |b| b.iter(|| parse_solve(MULTI_LINE)))
-        .with_function("lots", |b| {
-            b.iter(|| PUZZLES.lines().filter_map(parse_solve).count())
-        })
-        .with_function("hard", |b| b.iter(|| parse_solve(HARD)))
-        .sample_size(250);
-    c.bench("parse_solve", b);
+    c.bench_function("easy", |b| b.iter(|| parse_solve(ONE_LINE)));
+
+    c.bench_function("multi_line", |b| b.iter(|| parse_solve(MULTI_LINE)));
+
+    c.bench_function("lots", |b| {
+        b.iter(|| PUZZLES.lines().filter_map(parse_solve).count())
+    });
+    c.bench_function("hard", |b| b.iter(|| parse_solve(HARD)));
 }
 
 criterion_group!(benches, criterion_benchmark);

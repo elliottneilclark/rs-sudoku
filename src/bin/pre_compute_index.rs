@@ -1,6 +1,6 @@
 use rs_sudoku::slow_index::*;
 
-type IterFn = Fn(usize) -> RelatedIndexIterator;
+type IterFn = dyn Fn(usize) -> RelatedIndexIterator;
 fn main() {
     let fields: [(&str, Box<IterFn>); 3] = [
         (
