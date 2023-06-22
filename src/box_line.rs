@@ -9,8 +9,8 @@ pub trait LineBoxReduction {
 
 impl LineBoxReduction for Sudoku {
     fn box_line_reduce(&mut self) -> (usize, usize) {
-        [Grouping::RowType, Grouping::ColumnType]
-            .into_iter()
+        [Grouping::Row, Grouping::Column]
+            .iter()
             .find_map(|g| {
                 (0..9).find_map(|g_idx| {
                     let mut val_pos: [usize; 9] = [0; 9];
@@ -21,16 +21,16 @@ impl LineBoxReduction for Sudoku {
                         }
                     }
                     let removed: usize = val_pos
-                        .into_iter()
+                        .iter()
                         .enumerate()
                         .filter(|(_val_idx, val_pos_mask)| val_pos_mask.count_ones() == 1)
                         .map(|(val_idx, val_pos_mask)| {
                             let box_i = val_pos_mask.trailing_zeros() as usize;
-                            let iter = Grouping::BoxType.iter(box_i).filter(|i| {
+                            let iter = Grouping::Box.iter(box_i).filter(|i| {
                                 let (r, c, _b) = get_index_tuple(*i);
                                 match g {
-                                    Grouping::RowType => r != g_idx,
-                                    Grouping::ColumnType => c != g_idx,
+                                    Grouping::Row => r != g_idx,
+                                    Grouping::Column => c != g_idx,
                                     _ => true,
                                 }
                             });
@@ -44,6 +44,6 @@ impl LineBoxReduction for Sudoku {
                     }
                 })
             })
-            .unwrap_or_else(|| (0, 0))
+            .unwrap_or((0, 0))
     }
 }

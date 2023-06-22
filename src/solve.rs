@@ -113,8 +113,8 @@ mod tests {
     fn test_try_solve_easy() {
         let p = parse_sudoku(ONE_LINE).unwrap();
         let sr = p.try_solve();
-        assert_eq!(true, sr.is_solved);
-        assert_eq!(true, sr.is_valid);
+        assert!(sr.is_solved);
+        assert!(sr.is_valid);
         assert_eq!(41, sr.hidden_singles);
         assert_eq!(16, sr.naked_singles);
         assert_eq!(
@@ -148,7 +148,7 @@ mod tests {
         let s = "080090030030000000002060108020800500800907006004005070503040900000000010010050020";
         if let Ok(p) = parse_sudoku(s) {
             let sr = p.try_solve();
-            assert_eq!(true, sr.is_solved);
+            assert!(sr.is_solved);
             assert_eq!(
                 "486591732135278469972463158627814593851937246394625871563142987249786315718359624",
                 sr.state

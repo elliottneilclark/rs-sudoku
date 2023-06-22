@@ -122,6 +122,6 @@ impl FindSubset for Sudoku {
                 })
             })
             // If nothing else then return 0
-            .unwrap_or_else(|| (0, 0))
+            .unwrap_or((0, 0))
     }
 }

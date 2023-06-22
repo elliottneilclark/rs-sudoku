@@ -1,6 +1,6 @@
 use std::borrow::{Borrow, BorrowMut};
 use std::char;
-use std::convert::Into;
+use std::convert::From;
 use std::fmt;
 use std::iter::{IntoIterator, Iterator};
 
@@ -57,7 +57,7 @@ impl CandidateSet {
         }
     }
     pub fn get_candidates(self) -> usize {
-        (self.0 & !SOLVED)
+        self.0 & !SOLVED
     }
     pub fn get(self) -> usize {
         self.0
@@ -76,9 +76,9 @@ impl BorrowMut<usize> for CandidateSet {
     }
 }
 
-impl Into<usize> for CandidateSet {
-    fn into(self) -> usize {
-        self.0
+impl From<CandidateSet> for usize {
+    fn from(value: CandidateSet) -> Self {
+        value.0
     }
 }
 
@@ -149,7 +149,7 @@ mod tests {
         for i in 1..10 {
             let c = char::from_digit(i, 10).unwrap();
             let p = CandidateSet::parse_position(c).unwrap();
-            assert_eq!(true, p.is_solved());
+            assert!(p.is_solved());
             if let Some(v) = p.value() {
                 // Values should be equal
                 assert_eq!(i as usize, v);
@@ -157,8 +157,6 @@ mod tests {
                 for iv in p {
                     assert_eq!(1 << (i - 1), iv);
                 }
-            } else {
-                assert!(false);
             }
         }
     }

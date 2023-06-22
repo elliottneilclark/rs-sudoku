@@ -44,7 +44,7 @@ mod tests {
     fn error() {
         // Shouldn't be valid as it's not enough chars.
         let r = parse_sudoku("badd");
-        assert!(!r.is_ok())
+        assert!(r.is_err())
     }
 
     #[test]
@@ -62,13 +62,13 @@ mod tests {
     #[test]
     fn test_not_solved() {
         let p = parse_sudoku(ONE_LINE).unwrap();
-        assert_eq!(false, p.is_solved());
+        assert!(!p.is_solved());
     }
 
     #[test]
     fn test_weird() {
         let s = "000.00..00..00..00....00..000.0000000.0..0.0.0..000...0000000001.1101111.2....0.0";
         let p = parse_sudoku(s);
-        assert_eq!(true, !p.is_ok());
+        assert!(p.is_err());
     }
 }
